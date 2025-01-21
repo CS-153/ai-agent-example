@@ -1,0 +1,16 @@
+[project]
+name = "weather-agent-bot"
+version = "0.1.0"
+description = "A Discord bot that provides weather information automatically using a Mistral agent"
+authors = ["Thijs Simonian <thijs@stanford.edu>"]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "aiohttp>=3.11.11",
+    "audioop-lts>=0.2.1",
+    "discord>=2.3.2",
+    "langchain>=0.3.15",
+    "langchain-mistralai>=0.2.4",
+    "langgraph>=0.2.65",
+    "python-dotenv>=1.0.1",
+]
