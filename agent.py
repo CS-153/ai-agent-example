@@ -1,43 +1,50 @@
+# This is a basic ReAct agent that uses Mistral AI to answer weather questions.
+# A ReAct agent decides once its thinking is complete, and can use tools to get more information.
+#
+# It is designed to be piped every single message in a Discord server.
+# If a message asks about the weather in a specific location, it can use the seven_day_forecast tool to fetch the weather.
+# Check out the LangGraph documentation to explore building even more complex agents.
+
+import os
+import logging
+
 from langchain_mistralai import ChatMistralAI
 from langgraph.prebuilt import create_react_agent
-from langchain_core.tools import tool
-import os
-import httpx
+from tools.weather import seven_day_forecast
 
-WEATHER_API_BASE = "https://api.open-meteo.com/v1/forecast?current=temperature_2m,wind_speed_10m&hourly=temperature_2m,relative_humidity_2m,wind_speed_10m&temperature_unit=fahrenheit&wind_speed_unit=mph"
-USER_AGENT = "weather-app/1.0"
+logger = logging.getLogger("discord")
 
-
-def print_stream(stream):
-    for s in stream:
-        message = s["messages"][-1]
-        if isinstance(message, tuple):
-            print(message)
-        else:
-            message.pretty_print()
+SYSTEM_MESSAGE = """
+You are a helpful weather assistant viewing every message in a Discord server. Given a message, do the following:
+1. Determine if the user is requesting weather information for a city.
+2. If not, return only 'none'. If they do not explicitly ask for weather information, return only 'none'.
+3. If they are, extract the location mentioned and fetch the weather, then provide a concise response to the user that answers their question.
+4. Only use a tool if needed. Only use the necessary data from the tool to answer the user's question, not everything.
+5. Use markdown and emojis to make your response more engaging.
+6. Don't respond to the user unless they ask for weather information.
+"""
 
 
 class WeatherAgent:
     def __init__(self):
         MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+
         self.llm = ChatMistralAI(
             api_key=MISTRAL_API_KEY,
-            model_name="mistral-small-latest",
-            temperature=0.3,
+            model_name="ministral-8b-latest",
+            temperature=0.1,
         )
-        self.tools = [get_weather_tool]
+        self.tools = [seven_day_forecast]
+        # Use ReAct agent template to create the agent
         self.agent = create_react_agent(self.llm, tools=self.tools)
 
     def run(self, message: str):
-        system_message = """Given the following Discord message, determine if the user is SPECIFICALLY requesting weather information for a SPECIFIC city. If they are, extract the location mentioned and fetch the weather, then provide a detailed response to the user. Otherwise, return 'none'. Only use a tool if needed. Don't respond to the user unless they ask for weather information.
-        """
-
         final_state = self.agent.invoke(
             {
                 "messages": [
                     {
                         "role": "system",
-                        "content": system_message,
+                        "content": SYSTEM_MESSAGE,
                     },
                     {
                         "role": "user",
@@ -47,28 +54,9 @@ class WeatherAgent:
             },
         )
 
+        # The model returns "none" if the user's message does not contain weather information.
         if final_state["messages"][-1].content == "none":
-            print("User did not request weather information.")
+            logger.info("User did not request weather information.")
             return None
 
         return final_state["messages"][-1].content
-
-
-def make_weather_request(url: str):
-    print(f"Making weather request to {url}")
-    headers = {"User-Agent": USER_AGENT, "Accept": "application/geo+json"}
-
-    try:
-        response = httpx.Client().get(url, headers=headers, timeout=5.0)
-        response.raise_for_status()
-        return response.json()
-    except Exception:
-        return None
-
-
-@tool
-def get_weather_tool(latitude: str, longitude: str):
-    """Get the weather for a given location with latitude and longitude."""
-    print(f"Getting weather for {latitude}, {longitude}")
-    url = f"{WEATHER_API_BASE}&latitude={latitude}&longitude={longitude}"
-    return make_weather_request(url)

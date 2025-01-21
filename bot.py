@@ -1,10 +1,11 @@
-import discord
-from discord.ext import commands, tasks
-from discord.ext.commands import Context
 import os
-from dotenv import load_dotenv
+import discord
 import logging
 import platform
+
+from discord.ext import commands
+from discord.ext.commands import Context
+from dotenv import load_dotenv
 from agent import WeatherAgent
 
 intents = discord.Intents.default()
@@ -47,16 +48,16 @@ class DiscordBot(commands.Bot):
         )
 
     async def on_message(self, message: discord.Message):
-        if message.author == self.user:
+        # Ignore messages from self or other bots.
+        if message.author == self.user or message.author.bot:
             return
 
         self.logger.info(f"Message from {message.author}: {message.content}")
 
+        # Run the weather agent whenever the bot receives a message.
         response = self.weather_agent.run(message.content)
-        if response is None:
-            return
-
-        await message.reply(response)
+        if response is not None:
+            await message.reply(response)
 
     async def on_command_completion(self, ctx: Context):
         full_command_name = ctx.command.qualified_name
