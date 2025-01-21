@@ -1,9 +1,9 @@
-from langchain_core.tools import tool
 import httpx
 import logging
+import json
 
 USER_AGENT = "weather-app/1.0"
-WEATHER_API_BASE = "https://api.open-meteo.com/v1/forecast?current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FLos_Angeles"
+WEATHER_API_BASE = "https://api.open-meteo.com/v1/forecast?current=temperature_2m,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch&timezone=America%2FLos_Angeles"
 
 
 logger = logging.getLogger("discord")
@@ -20,7 +20,6 @@ def _make_request(url: str):
         return None
 
 
-@tool
 def seven_day_forecast(latitude: str, longitude: str):
     """Get the seven day forecast for a given location with latitude and longitude."""
     logger.info(f"Getting seven day forecast for {latitude}, {longitude}")
@@ -38,10 +37,12 @@ def seven_day_forecast(latitude: str, longitude: str):
     for i, time in enumerate(data["daily"]["time"]):
         max_temp = data["daily"]["temperature_2m_max"][i]
         min_temp = data["daily"]["temperature_2m_min"][i]
+        precipitation = data["daily"]["precipitation_probability_max"][i]
         res_json["daily"][time] = {
             "weather_code": data["daily"]["weather_code"][i],
             "temperature_max": f"{max_temp}°F",
             "temperature_min": f"{min_temp}°F",
+            "precipitation": f"{precipitation}%",
         }
 
-    return res_json
+    return json.dumps(res_json)

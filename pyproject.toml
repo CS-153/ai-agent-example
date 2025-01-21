@@ -9,8 +9,6 @@ dependencies = [
     "aiohttp>=3.11.11",
     "audioop-lts>=0.2.1",
     "discord>=2.3.2",
-    "langchain>=0.3.15",
-    "langchain-mistralai>=0.2.4",
-    "langgraph>=0.2.65",
+    "mistralai>=1.4.0",
     "python-dotenv>=1.0.1",
 ]

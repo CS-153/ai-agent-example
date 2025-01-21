@@ -80,9 +80,7 @@ class DiscordBot(commands.Bot):
         self.logger.info(f"Message from {message.author}: {message.content}")
 
         # Run the weather agent whenever the bot receives a message.
-        response = self.weather_agent.run(message.content)
-        if response is not None:
-            await message.reply(response)
+        await self.weather_agent.run(message, message.content)
 
     async def on_command_completion(self, ctx: Context):
         full_command_name = ctx.command.qualified_name

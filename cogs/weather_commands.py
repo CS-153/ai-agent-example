@@ -13,14 +13,10 @@ class WeatherCommands(commands.Cog):
         This command returns the weather for today.
         """
 
-        res = self.bot.weather_agent.run(
-            f"What is today's weather in {arg}? Only return today's forecast."
+        await self.bot.weather_agent.run(
+            ctx.message,
+            f"What is today's weather in {arg}? Only return today's forecast.",
         )
-
-        if res is None:
-            await ctx.reply("I couldn't find the weather for that location.")
-        else:
-            await ctx.reply(res)
 
     @commands.hybrid_command(name="week")
     async def week(self, ctx: Context, arg):
@@ -28,14 +24,10 @@ class WeatherCommands(commands.Cog):
         This command returns the weekly weather forecast for a given location.
         """
 
-        res = self.bot.weather_agent.run(
-            f"What is the weekly weather forecast in {arg}?"
+        await self.bot.weather_agent.run(
+            ctx.message,
+            f"What is the weekly weather forecast in {arg}?",
         )
-
-        if res is None:
-            await ctx.reply("I couldn't find the weather for that location.")
-        else:
-            await ctx.reply(res)
 
 
 async def setup(bot) -> None:
