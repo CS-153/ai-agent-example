@@ -14,6 +14,7 @@ from tools.weather import seven_day_forecast
 
 logger = logging.getLogger("discord")
 
+MISTRAL_MODEL = "ministral-8b-latest"
 SYSTEM_MESSAGE = """
 You are a helpful weather assistant viewing every message in a Discord server. Given a message, do the following:
 1. Determine if the user is requesting weather information for a city.
@@ -31,8 +32,8 @@ class WeatherAgent:
 
         self.llm = ChatMistralAI(
             api_key=MISTRAL_API_KEY,
-            model_name="ministral-8b-latest",
-            temperature=0.1,
+            model_name=MISTRAL_MODEL,
+            temperature=0.3,
         )
         self.tools = [seven_day_forecast]
         # Use ReAct agent template to create the agent

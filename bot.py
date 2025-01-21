@@ -40,6 +40,9 @@ class DiscordBot(commands.Bot):
         )
         self.logger.info("-------------------")
 
+        # Load all the cogs/commands.
+        await self.load_cogs()
+
         # Set the bot's custom status to "Watching the forecasts"
         await self.change_presence(
             activity=discord.Activity(
@@ -47,9 +50,31 @@ class DiscordBot(commands.Bot):
             )
         )
 
+    async def load_cogs(self) -> None:
+        """
+        This function loads all the cogs, or command categories, in the cogs directory.
+        """
+        for file in os.listdir(f"{os.path.realpath(os.path.dirname(__file__))}/cogs"):
+            if file.endswith(".py"):
+                extension = file[:-3]
+                try:
+                    await self.load_extension(f"cogs.{extension}")
+                    self.logger.info(f"Loaded extension '{extension}'")
+                except Exception as e:
+                    exception = f"{type(e).__name__}: {e}"
+                    self.logger.error(
+                        f"Failed to load extension {extension}\n{exception}"
+                    )
+
     async def on_message(self, message: discord.Message):
+        await self.process_commands(message)
+
         # Ignore messages from self or other bots.
-        if message.author == self.user or message.author.bot:
+        if (
+            message.author == self.user
+            or message.author.bot
+            or message.content.startswith("!")
+        ):
             return
 
         self.logger.info(f"Message from {message.author}: {message.content}")
@@ -66,6 +91,13 @@ class DiscordBot(commands.Bot):
         self.logger.info(
             f"Executed {executed_command} command in {ctx.guild.name} (ID: {ctx.guild.id}) by {ctx.author} (ID: {ctx.author.id})"
         )
+
+    async def on_command_error(self, context: Context, error) -> None:
+        if isinstance(error, commands.MissingRequiredArgument):
+            await context.reply("Please provide a location.")
+        else:
+            await context.reply("An error occurred while executing the command.")
+            raise error
 
 
 if __name__ == "__main__":
