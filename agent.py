@@ -23,25 +23,13 @@ class WeatherAgent:
         self.llm = ChatMistralAI(
             api_key=MISTRAL_API_KEY,
             model_name="mistral-small-latest",
-            temperature=0,
-            max_tokens=10000,
+            temperature=0.3,
         )
         self.tools = [get_weather_tool]
         self.agent = create_react_agent(self.llm, tools=self.tools)
 
     def run(self, message: str):
-        system_message = """Given the following Discord message, determine if the user is SPECIFICALLY requesting weather information for a SPECIFIC city. If they are, extract the location mentioned and fetch the weather. Otherwise, return 'none'. Only use a tool if needed. Don't respond to the user unless they ask for weather information. Provide as detailed info as possible.
-        
-          Examples of messages that are not weather related:
-          -----
-          User: I really like <city name>.
-          Output: none
-          -----
-          User: I really like the weather in <city name>.
-          Output: none
-          -----
-          User: How are you?
-          Output: none
+        system_message = """Given the following Discord message, determine if the user is SPECIFICALLY requesting weather information for a SPECIFIC city. If they are, extract the location mentioned and fetch the weather, then provide a detailed response to the user. Otherwise, return 'none'. Only use a tool if needed. Don't respond to the user unless they ask for weather information.
         """
 
         final_state = self.agent.invoke(
