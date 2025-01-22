@@ -4,6 +4,8 @@ This is an example final project for the class. Use this as a reference for what
 
 ## Weather Agent
 
+https://github.com/user-attachments/assets/0d1c6cc0-933e-4350-ab8d-49eb3e15ffc4
+
 This Discord bot listens for messages requesting information about the weather in a specific location (i.e. "What's the weather in SF?" or "Is it raining right now in NYC?") and responds to their prompt with accurate weather information.
 
 This is achieved through use of a _weather tool_ which gives the agent access to real-time weather data. Your projects will probably incorporate a tool of some sort as well to enhance the abilities of your agent.
