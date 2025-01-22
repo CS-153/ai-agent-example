@@ -131,9 +131,9 @@ class WeatherAgent:
 
         return response.choices[0].message.content
 
-    async def run(self, message: discord.Message, content: str):
+    async def run(self, message: discord.Message):
         # Extract the location from the message to verify that the user is asking about weather in a specific location.
-        location = await self.extract_location(content)
+        location = await self.extract_location(message.content)
         if location is None:
             return None
 
@@ -141,7 +141,7 @@ class WeatherAgent:
         res_message = await message.reply(f"Fetching weather for {location}...")
 
         # Use a second prompt chain to get the weather data and response.
-        weather_response = await self.get_weather_with_tools(location, content)
+        weather_response = await self.get_weather_with_tools(location, message.content)
 
         # Edit the message to show the weather data.
         await res_message.edit(content=weather_response)
