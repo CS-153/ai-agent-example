@@ -1,6 +1,6 @@
 # CS 153 - Weather Agent Example Code
 
-This is an example final project for the class. Use this as a reference for what we are looking for in a final project. See the [starter project](https://github.com/CS-153/ai-agent) for a quickstart template.
+This is an example final project for the class. Use this as a reference for what we are looking for in a final project.
 
 ## Weather Agent
 
