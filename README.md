@@ -1,6 +1,6 @@
 # CS 153 - Weather Agent Example Code
 
-This is an example final project for the class. Use this as a reference for what we are looking for in a final project.
+Here is an example of a very simple final project. This should be a good starter point giving you a sense of what technical abilities you will need for this class. This would be an example of a simple, passing grade project that has been built off our starter code. We're looking for much cooler and technically complex projects that will catch the eyes of our judges :).
 
 ## Weather Agent
 
